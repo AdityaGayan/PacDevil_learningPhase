@@ -1,7 +1,11 @@
 # PacDevil_learningPhase
 ## Run the project
 
-To view the final game run the following command in terminal
+To view the final game, clone this repository and run the following commands in terminal
+```bash
+cd PacDevil_learningPhase/task1
+```
+Then
 ```bash
 npm run dev
 ```
