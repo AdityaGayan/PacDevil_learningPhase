@@ -17,8 +17,8 @@ export default class gameScene extends Phaser.Scene {
         this.load.image("tiles", "/tileset.png");
         this.load.tilemapTiledJSON("map", "/map.json");
         this.load.spritesheet("player", "/player.png", {
-            frameWidth: 32,
-            frameHeight: 32
+            frameWidth: 48,
+            frameHeight: 48
         });
         this.load.spritesheet("coin", "coin.png", {
             frameWidth: 32,
@@ -34,34 +34,36 @@ export default class gameScene extends Phaser.Scene {
         walls.setCollisionByExclusion([-1]); 
         this.physics.world.bounds.width = map.widthInPixels;
         this.physics.world.bounds.height = map.heightInPixels;
-        this.player = this.physics.add.sprite(64, 900, "player"); 
+        this.player = this.physics.add.sprite(64, 600, "player"); 
         this.player.setCollideWorldBounds(true);
         this.physics.add.collider(this.player, walls);
         this.cursors = this.input.keyboard!.createCursorKeys();
+
         this.anims.create({
-            key: "down",
-            frames: this.anims.generateFrameNumbers("player", { start: 0, end: 1 }),
-            frameRate: 8,
+            key: "walk-down",
+            frames: this.anims.generateFrameNumbers("player", { start: 0, end: 3 }),
+            frameRate: 10,
             repeat: -1
         });
         this.anims.create({
-            key: "left",
-            frames: this.anims.generateFrameNumbers("player", { start: 2, end: 3 }),
-            frameRate: 8,
+            key: "walk-left",
+            frames: this.anims.generateFrameNumbers("player", { start: 4, end: 7 }),
+            frameRate: 10,
             repeat: -1
         });
         this.anims.create({
-            key: "right",
-            frames: this.anims.generateFrameNumbers("player", { start: 4, end: 5 }),
-            frameRate: 8,
+            key: "walk-right",
+            frames: this.anims.generateFrameNumbers("player", { start: 8, end: 11 }),
+            frameRate: 10,
             repeat: -1
         });
         this.anims.create({
-            key: "up",
-            frames: this.anims.generateFrameNumbers("player", { start: 6, end: 7 }),
-            frameRate: 8,
+            key: "walk-up",
+            frames: this.anims.generateFrameNumbers("player", { start: 12, end: 15 }),
+            frameRate: 10,
             repeat: -1
         });
+
         this.coins = this.physics.add.group();
         const coinPositions = [
             { x: 100, y: 100 },
@@ -70,19 +72,16 @@ export default class gameScene extends Phaser.Scene {
             { x: 1100, y: 700 },
             { x: 1200, y: 120 },
         ];
-
         coinPositions.forEach(pos => {
             const coin = this.coins.create(pos.x, pos.y, "coin");
             coin.play("spin");
         });
-        this.physics.add.overlap(this.player, this.coins, this.collectCoin, undefined, this);
 
-        // Score
+        this.physics.add.overlap(this.player, this.coins, this.collectCoin, undefined, this);
         this.highScore = Number(localStorage.getItem("highScore")) || 0;
         this.scoreText = this.add.text(10, 10, "Score: 0", { fontSize: "20px", color: "#fff" }).setScrollFactor(0);
         this.highScoreText = this.add.text(10, 35, `High Score: ${this.highScore}`, { fontSize: "20px", color: "#fff" }).setScrollFactor(0);
 
-        // Camera follow
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     }
@@ -100,44 +99,31 @@ export default class gameScene extends Phaser.Scene {
     };
 
     update() {
-    const speed = 150;
-    const cursors = this.cursors;
-    const player = this.player;
+        const speed = 150;
+        const cursors = this.cursors;
+        const player = this.player;
 
-    player.setVelocity(0);
-
-    if (cursors.left.isDown) {
-        player.setVelocityX(-speed);
-        player.play("left", true);
-        return;
+        player.setVelocity(0);
+        if (cursors.left.isDown) {
+            player.setVelocityX(-speed);
+            player.play("left", true);
+            return;
+        }
+        if (cursors.right.isDown) {
+            player.setVelocityX(speed);
+            player.play("right", true);
+            return;
+        }
+        if (cursors.up.isDown) {
+            player.setVelocityY(-speed);
+            player.play("up", true);
+            return;
+        }
+        if (cursors.down.isDown) {
+            player.setVelocityY(speed);
+            player.play("down", true);
+            return;
+        }
+        player.anims.stop();
     }
-
-    if (cursors.right.isDown) {
-        player.setVelocityX(speed);
-        player.play("right", true);
-        return;
-    }
-
-    if (cursors.up.isDown) {
-        player.setVelocityY(-speed);
-        player.play("up", true);
-        return;
-    }
-
-    if (cursors.down.isDown) {
-        player.setVelocityY(speed);
-        player.play("down", true);
-        return;
-    }
-
-    // No key pressed → stop animation
-    player.anims.stop();
-}
-
-
-
-
-
-
-
 }
