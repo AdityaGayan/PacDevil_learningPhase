@@ -11,7 +11,7 @@ The project contains two Python scripts. Each script:
 
 ---
 
-# **Why PPO Instead of DQN? (Simple Explanation)**
+# **Why PPO Instead of DQN?**
 
 ### **1. PPO is more stable**
 PPO is designed to update the policy slowly and safely.  
